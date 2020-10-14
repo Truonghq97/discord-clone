@@ -1,4 +1,5 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import AddIcon from "@material-ui/icons/Add";
 import SignalCellularAltIcon from "@material-ui/icons/SignalCellularAlt";
@@ -11,8 +12,12 @@ import SettingsIcon from "@material-ui/icons/Settings";
 import "./Sidebar.css";
 import SidebarChannel from "../sidebarChannel/SidebarChannel";
 import { Avatar } from "@material-ui/core";
+import { selectUser } from "../../features/userSlice";
+import { auth } from "../../firebase";
 
 function Sidebar() {
+  const user = useSelector(selectUser);
+
   return (
     <div className="sidebar">
       <div className="sidebar__top">
@@ -53,10 +58,10 @@ function Sidebar() {
       </div>
 
       <div className="sidebar__profile">
-        <Avatar src="https://scontent.fsgn2-5.fna.fbcdn.net/v/t1.0-9/120734594_3483412948387853_2471357943453684604_o.jpg?_nc_cat=104&_nc_sid=09cbfe&_nc_ohc=AmHDi6vEIjYAX9hkkL_&_nc_ht=scontent.fsgn2-5.fna&oh=47801cfffc3e3363b9bf88708ee72adf&oe=5FA9D76B" />
+        <Avatar onClick={() => auth.signOut()} src={user.photo} />
         <div className="sidebar__profileInfo">
-          <h3>@Lee Ji-eun </h3>
-          <p>#thisIsMyID</p>
+          <h3>{user.displayName} </h3>
+          <p>#{user.uid.substring(0, 5)}</p>
         </div>
 
         <div className="sidebar__profileIcons">
