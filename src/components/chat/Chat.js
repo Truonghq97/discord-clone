@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
 import CardGiftcardIcon from "@material-ui/icons/CardGiftcard";
@@ -8,23 +9,75 @@ import EmojiEmotionsIcon from "@material-ui/icons/EmojiEmotions";
 import ChatHeader from "../chatHeader/ChatHeader";
 import Message from "../message/Message";
 import "./Chat.css";
+import { selectChannelName, selectChannelId } from "../../features/appSlice";
+import { selectUser } from "../../features/userSlice";
+import db from "../../firebase";
+import firebase from "firebase";
 
 function Chat() {
+  const user = useSelector(selectUser);
+  const channelName = useSelector(selectChannelName);
+  const channelId = useSelector(selectChannelId);
+  const [input, setInput] = useState("");
+  const [messages, setMessages] = useState([]);
+
+  useEffect(() => {
+    if (channelId) {
+      db.collection("channels")
+        .doc(channelId)
+        .collection("messages")
+        .orderBy("timestamp", "desc")
+        .onSnapshot((snapshot) =>
+          setMessages(snapshot.docs.map((doc) => doc.data()))
+        );
+    }
+
+    // return () => {
+    //   cleanup
+    // }
+  }, [channelId]);
+
+  const sendMessage = (e) => {
+    e.preventDefault();
+
+    db.collection("channels").doc(channelId).collection("messages").add({
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      message: input,
+      user: user
+    })
+
+    setInput("");
+  }
+
   return (
     <div className="chat">
-      <ChatHeader />
+      <ChatHeader channelName={channelName} />
 
       <div className="chat__messages">
-        <Message />
-        <Message />
-        <Message />
+        {messages.map((message) => (
+          <Message 
+            timestamp={message.timestamp}
+            message={message.message}
+            user={message.user}
+          />
+        ))}
       </div>
 
       <div className="chat__input">
         <AddCircleOutlineIcon fontSize="large" />
         <form>
-          <input placeholder={`Message #TESTCHANNEL`} />
-          <button className="chat__inputButton" type="submit">
+          <input
+            value={input}
+            disabled={!channelId}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder={`Message #${channelName}`}
+          />
+          <button
+            className="chat__inputButton"
+            disabled={!channelId}
+            type="submit"
+            onClick={sendMessage}
+          >
             Send Message
           </button>
         </form>

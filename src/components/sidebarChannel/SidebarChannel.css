@@ -3,7 +3,7 @@
     background-color: #40464b;
 }
 
-.sidebarChannel {
+.sidebarChannel > h4 {
     display: flex;
     padding-left: 15px;
     align-items: center;

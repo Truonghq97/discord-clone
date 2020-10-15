@@ -9,13 +9,13 @@ import HelpIcon from "@material-ui/icons/Help";
 
 import "./ChatHeader.css";
 
-function ChatHeader() {
+function ChatHeader({ channelName }) {
   return (
     <div className="chatHeader">
       <div className="chatHeader__left">
         <h3>
           <span className="chatHeader__hash">#</span>
-          Youtube
+          {channelName}
         </h3>
       </div>
 
